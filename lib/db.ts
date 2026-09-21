@@ -1,6 +1,7 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import { API_KEYS_SCHEMA } from "./api-keys";
+import { JEV_QUESTIONS_SCHEMA } from "./jev-questions";
 import * as schema from "./schema";
 
 function poolSsl(connectionString: string) {
@@ -91,6 +92,7 @@ export async function ensureAuthTables() {
     globalForDb.roseAuthReady = getPool()
       .query(AUTH_SCHEMA)
       .then(() => getPool().query(API_KEYS_SCHEMA))
+      .then(() => getPool().query(JEV_QUESTIONS_SCHEMA))
       .then(() => undefined);
   }
   await globalForDb.roseAuthReady;

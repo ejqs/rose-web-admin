@@ -1,6 +1,6 @@
 # rose-web-admin
 
-Control plane for **Rose**. Configure **rose-bot** here (sources, pause/unpause). Later: opinions / Jev. There is no rose-service.
+Control plane for **Rose**. Configure **rose-bot** here (sources, pause/unpause, Jev questions). There is no rose-service.
 
 Auth is email/password via better-auth. No public signup. First admin is seeded from `ADMIN_EMAIL` + `ADMIN_PASSWORD`.
 
@@ -22,10 +22,11 @@ npm run dev
 | `/sources` | Add / edit / pause sources |
 | `/articles` | Body preview |
 | `/keys` | Generate / copy / revoke / rotate bot API keys |
+| `/questions` | Add / edit / disable Jev taxonomy questions |
 | `GET /health` | Railway probe |
 
-Auth tables (`user`, `session`, `account`, `verification`) and `api_keys` are created on first boot if missing. Existing scrape tables are never recreated.
+Auth tables (`user`, `session`, `account`, `verification`) and `api_keys` are created on first boot if missing. Existing scrape tables are never recreated. `jev_questions` is `CREATE TABLE IF NOT EXISTS` so the questions form works; rose-bot seeds globe + hop-in + metadata rows.
 
-API keys: [docs/api-keys.md](docs/api-keys.md). Index: [docs/README.md](docs/README.md).
+API keys: [docs/api-keys.md](docs/api-keys.md). Jev questions: [docs/jev-questions.md](docs/jev-questions.md). Index: [docs/README.md](docs/README.md).
 
 Public site: [rose-web-public](https://github.com/ejqs/rose-web-public). Bot: [newsey](https://github.com/ejqs/newsey).
