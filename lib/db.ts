@@ -1,6 +1,17 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
+import { API_KEYS_SCHEMA } from "./api-keys";
 import * as schema from "./schema";
+
+function poolSsl(connectionString: string) {
+  try {
+    const mode = new URL(connectionString).searchParams.get("sslmode");
+    if (mode === "disable") return false;
+  } catch {
+    /* ignore */
+  }
+  return { rejectUnauthorized: false } as const;
+}
 
 const AUTH_SCHEMA = `
 CREATE TABLE IF NOT EXISTS "user" (
@@ -62,7 +73,7 @@ function getPool() {
     globalForDb.rosePool = new Pool({
       connectionString: url,
       max: 3,
-      ssl: { rejectUnauthorized: false },
+      ssl: poolSsl(url),
     });
   }
   return globalForDb.rosePool;
@@ -77,7 +88,10 @@ export function getDb() {
 
 export async function ensureAuthTables() {
   if (!globalForDb.roseAuthReady) {
-    globalForDb.roseAuthReady = getPool().query(AUTH_SCHEMA).then(() => undefined);
+    globalForDb.roseAuthReady = getPool()
+      .query(AUTH_SCHEMA)
+      .then(() => getPool().query(API_KEYS_SCHEMA))
+      .then(() => undefined);
   }
   await globalForDb.roseAuthReady;
 }
