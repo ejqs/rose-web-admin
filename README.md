@@ -19,7 +19,7 @@ npm run dev
 | --- | --- |
 | `/login` | Sign in |
 | `/` | Bot health + source status |
-| `/sources` | Add / edit / pause sources |
+| `/sources` | Discover feeds (URLs/OPML), catalog add, edit / pause sources |
 | `/articles` | Body preview |
 | `/keys` | Generate / copy / revoke / rotate bot API keys |
 | `/questions` | Add / edit / disable Jev taxonomy questions |
@@ -27,6 +27,6 @@ npm run dev
 
 Auth tables (`user`, `session`, `account`, `verification`) and `api_keys` are created on first boot if missing. Existing scrape tables are never recreated. `jev_questions` is `CREATE TABLE IF NOT EXISTS` so the questions form works; rose-bot seeds globe + hop-in + metadata rows.
 
-API keys: [docs/api-keys.md](docs/api-keys.md). Jev questions: [docs/jev-questions.md](docs/jev-questions.md). Index: [docs/README.md](docs/README.md).
+API keys: [docs/api-keys.md](docs/api-keys.md). Jev questions: [docs/jev-questions.md](docs/jev-questions.md). Sources: [docs/sources.md](docs/sources.md). Index: [docs/README.md](docs/README.md).
 
 Public site: [rose-web-public](https://github.com/ejqs/rose-web-public). Bot: [newsey](https://github.com/ejqs/newsey).

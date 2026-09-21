@@ -36,7 +36,7 @@ export default async function DashboardPage() {
         <div>
           <h1 className="text-xl font-semibold">Bot health</h1>
           <p className="text-sm text-muted-foreground">
-            Config is written here. rose-bot reads <code>news_sources</code> and scrapes. Paused sources are never picked.
+            Config is written here. Discover feeds on <a className="underline-offset-4 hover:underline" href="/sources">Sources</a>. rose-bot reads <code>news_sources</code> and scrapes. Paused sources are never picked.
           </p>
         </div>
         <p className="text-sm">
