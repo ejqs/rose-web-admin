@@ -1,5 +1,20 @@
 import { boolean, integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
+export const jevQuestions = pgTable("jev_questions", {
+  id: integer("id").generatedByDefaultAsIdentity().primaryKey(),
+  questionId: text("question_id").notNull().unique(),
+  type: text("type").notNull(),
+  instructions: text("instructions").notNull(),
+  criteria: text("criteria"),
+  criteriaSource: text("criteria_source"),
+  dependsOn: text("depends_on"),
+  enabled: integer("enabled").notNull().default(1),
+  sortOrder: integer("sort_order").notNull().default(0),
+  notes: text("notes"),
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+});
+
 export const newsSources = pgTable("news_sources", {
   id: integer("id").generatedByDefaultAsIdentity().primaryKey(),
   name: text("name").notNull(),

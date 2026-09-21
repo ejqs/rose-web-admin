@@ -18,6 +18,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
               <Link href="/sources">Sources</Link>
               <Link href="/articles">Articles</Link>
               <Link href="/keys">API keys</Link>
+              <Link href="/questions">Questions</Link>
             </nav>
             <div className="flex items-center gap-3 text-sm text-muted-foreground">
               <span>{session.user.email}</span>
