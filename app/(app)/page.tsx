@@ -1,6 +1,3 @@
-import { count, desc } from "drizzle-orm";
-import { getDb } from "@/lib/db";
-import { articles, newsSources } from "@/lib/schema";
 import { Badge } from "@/components/ui/badge";
 import { FadeIn } from "@/components/motion";
 import {
@@ -11,24 +8,26 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { backendFetch } from "@/lib/backend";
+import { requireSession } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
+type Source = {
+  id: number;
+  name: string;
+  status: string;
+  last_success_at: string | null;
+  last_error: string | null;
+  next_eligible_at: string;
+  articles_scraped_count: number;
+};
+
 export default async function DashboardPage() {
-  const db = getDb();
-  const [{ n: articleCount }] = await db.select({ n: count() }).from(articles);
-  const sources = await db
-    .select({
-      id: newsSources.id,
-      name: newsSources.name,
-      status: newsSources.status,
-      lastSuccessAt: newsSources.lastSuccessAt,
-      lastError: newsSources.lastError,
-      nextEligibleAt: newsSources.nextEligibleAt,
-      articlesScrapedCount: newsSources.articlesScrapedCount,
-    })
-    .from(newsSources)
-    .orderBy(desc(newsSources.priority));
+  const { token } = await requireSession();
+  const { data } = await backendFetch<{ articles?: number; sources?: Source[] }>("/v1/admin/dashboard", { token });
+  const sources = data.sources || [];
+  const articleCount = Number(data.articles || 0);
 
   return (
     <FadeIn>
@@ -36,11 +35,11 @@ export default async function DashboardPage() {
         <div>
           <h1 className="text-xl font-semibold">Bot health</h1>
           <p className="text-sm text-muted-foreground">
-            Config is written here. rose-bot reads <code>news_sources</code> and scrapes. Paused sources are never picked.
+            Config is written here via rose-backend. rose-bot leases sources over HTTP. Paused sources are never picked.
           </p>
         </div>
         <p className="text-sm">
-          Articles stored: <strong>{Number(articleCount)}</strong> · Sources:{" "}
+          Articles stored: <strong>{articleCount}</strong> · Sources:{" "}
           <strong>{sources.length}</strong>
         </p>
         <Table>
@@ -61,10 +60,10 @@ export default async function DashboardPage() {
                 <TableCell>
                   <Badge variant={s.status === "ok" ? "default" : "outline"}>{s.status}</Badge>
                 </TableCell>
-                <TableCell>{s.articlesScrapedCount}</TableCell>
-                <TableCell className="text-muted-foreground">{s.lastSuccessAt || "—"}</TableCell>
-                <TableCell className="text-muted-foreground">{s.nextEligibleAt}</TableCell>
-                <TableCell className="max-w-xs truncate text-muted-foreground">{s.lastError || "—"}</TableCell>
+                <TableCell>{s.articles_scraped_count}</TableCell>
+                <TableCell className="text-muted-foreground">{s.last_success_at || "—"}</TableCell>
+                <TableCell className="text-muted-foreground">{s.next_eligible_at}</TableCell>
+                <TableCell className="max-w-xs truncate text-muted-foreground">{s.last_error || "—"}</TableCell>
               </TableRow>
             ))}
           </TableBody>

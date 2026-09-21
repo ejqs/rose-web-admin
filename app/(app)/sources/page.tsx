@@ -1,17 +1,29 @@
-import { desc } from "drizzle-orm";
-import { getDb } from "@/lib/db";
-import { newsSources } from "@/lib/schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { FadeIn, MagnetButton } from "@/components/motion";
+import { backendFetch } from "@/lib/backend";
+import { requireSession } from "@/lib/session";
 import { createSource, setSourceStatus, updateSource } from "./actions";
 
 export const dynamic = "force-dynamic";
 
+type Source = {
+  id: number;
+  name: string;
+  status: string;
+  priority: number;
+  base_url: string;
+  feed_url: string | null;
+  scrape_method: string;
+  last_error: string | null;
+};
+
 export default async function SourcesPage() {
-  const sources = await getDb().select().from(newsSources).orderBy(desc(newsSources.priority));
+  const { token } = await requireSession();
+  const { data } = await backendFetch<{ sources?: Source[] }>("/v1/admin/sources", { token });
+  const sources = data.sources || [];
 
   return (
     <FadeIn>
@@ -71,15 +83,15 @@ export default async function SourcesPage() {
                 </div>
                 <div className="grid gap-1">
                   <Label>Base URL</Label>
-                  <Input name="base_url" defaultValue={s.baseUrl} required />
+                  <Input name="base_url" defaultValue={s.base_url} required />
                 </div>
                 <div className="grid gap-1">
                   <Label>Feed URL</Label>
-                  <Input name="feed_url" defaultValue={s.feedUrl ?? ""} required />
+                  <Input name="feed_url" defaultValue={s.feed_url ?? ""} required />
                 </div>
                 <div className="grid gap-1">
                   <Label>Method</Label>
-                  <Input name="scrape_method" defaultValue={s.scrapeMethod} />
+                  <Input name="scrape_method" defaultValue={s.scrape_method} />
                 </div>
                 <div className="flex items-end">
                   <Button type="submit" variant="outline">
@@ -98,8 +110,8 @@ export default async function SourcesPage() {
                   </form>
                 ))}
               </div>
-              {s.lastError ? (
-                <p className="text-sm text-muted-foreground">Last error: {s.lastError}</p>
+              {s.last_error ? (
+                <p className="text-sm text-muted-foreground">Last error: {s.last_error}</p>
               ) : null}
             </li>
           ))}

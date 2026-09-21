@@ -1,27 +1,26 @@
-import { desc, eq } from "drizzle-orm";
-import { getDb } from "@/lib/db";
-import { articles, newsSources } from "@/lib/schema";
 import { FadeIn } from "@/components/motion";
 import { Badge } from "@/components/ui/badge";
+import { backendFetch } from "@/lib/backend";
+import { requireSession } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
+type Article = {
+  id: number;
+  title: string;
+  url: string;
+  body_preview: string;
+  body_truncated: boolean;
+  published_at: string | null;
+  scraped_at: string | null;
+  jev_status: string;
+  source: string;
+};
+
 export default async function ArticlesPage() {
-  const rows = await getDb()
-    .select({
-      id: articles.id,
-      title: articles.title,
-      url: articles.url,
-      bodyText: articles.bodyText,
-      publishedAt: articles.publishedAt,
-      scrapedAt: articles.scrapedAt,
-      jevStatus: articles.jevStatus,
-      source: newsSources.name,
-    })
-    .from(articles)
-    .innerJoin(newsSources, eq(articles.sourceId, newsSources.id))
-    .orderBy(desc(articles.id))
-    .limit(40);
+  const { token } = await requireSession();
+  const { data } = await backendFetch<{ articles?: Article[] }>("/v1/admin/articles?limit=40", { token });
+  const rows = data.articles || [];
 
   return (
     <FadeIn>
@@ -40,14 +39,14 @@ export default async function ArticlesPage() {
                   {row.title}
                 </a>
                 <Badge variant="outline">{row.source}</Badge>
-                <Badge variant="secondary">{row.jevStatus}</Badge>
+                <Badge variant="secondary">{row.jev_status}</Badge>
               </div>
               <p className="text-xs text-muted-foreground">
-                {row.publishedAt || row.scrapedAt} · {row.url}
+                {row.published_at || row.scraped_at} · {row.url}
               </p>
               <p className="whitespace-pre-wrap text-sm leading-relaxed">
-                {row.bodyText.slice(0, 2000)}
-                {row.bodyText.length > 2000 ? "…" : ""}
+                {row.body_preview}
+                {row.body_truncated ? "…" : ""}
               </p>
             </li>
           ))}

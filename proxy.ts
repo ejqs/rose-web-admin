@@ -1,16 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSessionCookie } from "better-auth/cookies";
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  if (
-    pathname.startsWith("/login") ||
-    pathname.startsWith("/api/auth") ||
-    pathname === "/health"
-  ) {
+  if (pathname.startsWith("/login") || pathname === "/health") {
     return NextResponse.next();
   }
-  if (!getSessionCookie(request)) {
+  if (!request.cookies.get("rose_session")?.value) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
   return NextResponse.next();

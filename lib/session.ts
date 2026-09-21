@@ -1,13 +1,17 @@
-import { headers } from "next/headers";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { auth } from "./auth";
-import { ensureAuthTables } from "./db";
-import { seedAdmin } from "./seed-admin";
+import { backendFetch, SESSION_COOKIE } from "./backend";
+
+export type SessionUser = { id: string; email: string; name: string };
+
+export async function getSessionToken() {
+  return (await cookies()).get(SESSION_COOKIE)?.value || "";
+}
 
 export async function requireSession() {
-  await ensureAuthTables();
-  await seedAdmin();
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) redirect("/login");
-  return session;
+  const token = await getSessionToken();
+  if (!token) redirect("/login");
+  const { status, data } = await backendFetch<{ ok?: boolean; user?: SessionUser }>("/v1/auth/session", { token });
+  if (status !== 200 || !data.user) redirect("/login");
+  return { user: data.user, token };
 }
