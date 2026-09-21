@@ -21,8 +21,11 @@ npm run dev
 | `/` | Bot health + source status |
 | `/sources` | Add / edit / pause sources |
 | `/articles` | Body preview |
+| `/keys` | Generate / copy / revoke / rotate bot API keys |
 | `GET /health` | Railway probe |
 
-Auth tables (`user`, `session`, `account`, `verification`) are created on first boot if missing. Existing scrape tables are never recreated.
+Auth tables (`user`, `session`, `account`, `verification`) and `api_keys` are created on first boot if missing. Existing scrape tables are never recreated.
+
+API keys: [docs/api-keys.md](docs/api-keys.md). Index: [docs/README.md](docs/README.md).
 
 Public site: [rose-web-public](https://github.com/ejqs/rose-web-public). Bot: [newsey](https://github.com/ejqs/newsey).

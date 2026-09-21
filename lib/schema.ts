@@ -80,6 +80,18 @@ export const account = pgTable("account", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+export const apiKeys = pgTable("api_keys", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  prefix: text("prefix").notNull(),
+  secretHash: text("secret_hash").notNull().unique(),
+  scopes: text("scopes").notNull(),
+  createdBy: text("created_by"),
+  createdAt: text("created_at").notNull(),
+  lastUsedAt: text("last_used_at"),
+  revokedAt: text("revoked_at"),
+});
+
 export const verification = pgTable("verification", {
   id: text("id").primaryKey(),
   identifier: text("identifier").notNull(),
